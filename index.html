@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>스마트 영어 활동 카드 뽑기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1:#EEF1FF;
+  --bg2:#FDEFFB;
+  --ink:#2A2550;
+  --ink-soft:#6B6693;
+  --violet:#6C5CE7;
+  --violet-dark:#4B3FCB;
+  --coral:#FF6B6B;
+  --coral-dark:#E64F4F;
+  --tangerine:#FF9F45;
+  --mint:#22C3A6;
+  --mint-dark:#159E85;
+  --raspberry:#FF5D8F;
+  --sun:#FFC93C;
+  --paper:#FFFFFF;
+  --r-lg:28px;
+  --r-md:18px;
+  --r-sm:12px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:'Noto Sans KR',sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 8% 12%, rgba(108,92,231,0.16), transparent 40%),
+    radial-gradient(circle at 92% 18%, rgba(255,107,107,0.16), transparent 42%),
+    radial-gradient(circle at 15% 92%, rgba(34,195,166,0.14), transparent 40%),
+    radial-gradient(circle at 90% 88%, rgba(255,201,60,0.18), transparent 40%),
+    linear-gradient(160deg,var(--bg1),var(--bg2));
+  background-attachment:fixed;
+}
+.display{font-family:'Fredoka','Noto Sans KR',sans-serif}
+
+.wrap{max-width:920px;margin:auto;padding:28px 16px 48px;text-align:center}
+
+.eyebrow{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--paper);color:var(--violet-dark);
+  font-weight:700;font-size:12px;letter-spacing:0.06em;
+  padding:6px 14px;border-radius:999px;
+  box-shadow:0 4px 14px rgba(108,92,231,0.18);
+  margin-bottom:10px;
+}
+h1{
+  margin:0 0 8px;font-size:clamp(24px,5vw,34px);
+  font-weight:700;letter-spacing:0.2px;
+  background:linear-gradient(100deg,var(--violet) 10%,var(--raspberry) 55%,var(--tangerine) 95%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.desc{color:var(--ink-soft);margin-bottom:26px;font-size:14px;font-weight:500}
+
+/* ===== 카드 스테이지 ===== */
+.card-stage{
+  position:relative;width:min(76vw,320px);height:195px;
+  margin:auto auto 20px;perspective:1200px;
+  display:flex;align-items:center;justify-content:center;
+}
+.card-stage .deco{position:absolute;font-size:22px;pointer-events:none;opacity:0.85;filter:drop-shadow(0 4px 6px rgba(0,0,0,0.08))}
+.card-stage .deco.d1{top:-6px;left:2%;animation:floaty 3.4s ease-in-out infinite}
+.card-stage .deco.d2{bottom:2px;right:0%;animation:floaty 3.8s ease-in-out infinite 0.4s}
+.card-stage .deco.d3{top:38%;left:-6%;animation:floaty 4.2s ease-in-out infinite 0.9s;font-size:16px}
+.card-stage .deco.d4{top:8%;right:-4%;animation:floaty 3.6s ease-in-out infinite 1.2s;font-size:18px}
+@media (prefers-reduced-motion:no-preference){
+  @keyframes floaty{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-8px) rotate(8deg)}}
+}
+
+.flying-deck{position:absolute;width:100%;height:100%;top:0;left:0;pointer-events:none;display:none;z-index:5}
+.fly-card{
+  position:absolute;width:100%;height:100%;
+  background:linear-gradient(135deg,var(--violet),var(--violet-dark));
+  border-radius:var(--r-lg);
+  box-shadow:0 18px 34px rgba(108,92,231,0.35);
+  top:0;left:0;border:4px solid #fff;
+}
+.shuffling .fly-card:nth-child(1){animation: dynLeft 0.25s infinite alternate cubic-bezier(0.1,0.9,0.2,1)}
+.shuffling .fly-card:nth-child(2){animation: dynRight 0.25s infinite alternate cubic-bezier(0.1,0.9,0.2,1)}
+.shuffling .fly-card:nth-child(3){animation: dynCenter 0.15s infinite alternate cubic-bezier(0.1,0.9,0.2,1)}
+@keyframes dynLeft{0%{transform:translate(0,0) rotate(0deg) scale(1);}100%{transform:translate(-60px,-20px) rotate(-18deg) scale(0.9);opacity:0.9;}}
+@keyframes dynRight{0%{transform:translate(0,0) rotate(0deg) scale(1);}100%{transform:translate(60px,20px) rotate(18deg) scale(0.9);opacity:0.9;}}
+@keyframes dynCenter{0%{transform:translate(0,0) rotate(0deg) scale(0.95);}100%{transform:translate(0,-35px) rotate(6deg) scale(0.98);opacity:1;}}
+
+.card{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform 0.6s cubic-bezier(0.34,1.56,0.64,1);cursor:pointer;z-index:2}
+.card:focus-visible{outline:3px solid var(--sun);outline-offset:6px;border-radius:var(--r-lg)}
+.card.is-flipped{transform:rotateY(180deg)}
+
+.card-face{
+  position:absolute;width:100%;height:100%;backface-visibility:hidden;
+  border-radius:var(--r-lg);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:18px;
+  box-shadow:0 16px 34px rgba(42,37,80,0.18);
+  overflow:hidden;
+}
+/* 티켓 펀치홀 느낌 */
+.card-face::before,.card-face::after{
+  content:"";position:absolute;left:0;right:0;height:14px;
+  background-image:radial-gradient(circle,rgba(255,255,255,0.9) 0 4px,transparent 4.5px);
+  background-size:22px 14px;background-repeat:repeat-x;background-position:10px center;
+  opacity:0.55;
+}
+.card-face::before{top:14px}
+.card-face::after{bottom:14px}
+
+.card-front{background:linear-gradient(135deg,var(--violet) 0%,var(--violet-dark) 100%);color:#fff;border:4px solid #fff}
+.card-front .icon{font-size:38px;margin-bottom:6px}
+@media (prefers-reduced-motion:no-preference){.card-front .icon{animation:bounce 1.6s infinite}}
+.card-front .title-main{font-family:'Fredoka','Noto Sans KR',sans-serif;font-size:21px;font-weight:600;letter-spacing:0.5px}
+.card-front .sub{font-size:13px;opacity:0.85;margin-top:6px;font-weight:500}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+.card-back{background:linear-gradient(135deg,var(--coral) 0%,var(--tangerine) 100%);color:#fff;transform:rotateY(180deg);border:4px solid #fff}
+.card-back .ribbon{
+  position:absolute;top:13px;left:-32px;width:130px;text-align:center;
+  background:rgba(42,37,80,0.55);color:#fff;font-size:11px;font-weight:700;
+  letter-spacing:1.3px;padding:4px 0;transform:rotate(-40deg);
+  box-shadow:0 2px 6px rgba(0,0,0,0.15);
+}
+.card-back .card-text{
+  font-family:'Fredoka','Noto Sans KR',sans-serif;
+  font-size:25px;font-weight:600;text-align:center;word-break:break-word;line-height:1.28;
+  margin-top:4px;
+}
+.card-back .shine{
+  position:absolute;top:0;left:-160%;width:55%;height:100%;
+  background:linear-gradient(120deg,transparent,rgba(255,255,255,0.55),transparent);
+  transform:skewX(-20deg);pointer-events:none;
+}
+.card.is-flipped .card-back .shine{animation:shineSweep 0.9s ease-out 0.55s;}
+@keyframes shineSweep{from{left:-160%}to{left:160%}}
+
+.draw-btn{
+  font-family:'Fredoka','Noto Sans KR',sans-serif;
+  background:linear-gradient(100deg,var(--sun),var(--tangerine));
+  color:#4A2600;border:0;border-radius:999px;padding:16px 40px;
+  font-size:18px;font-weight:600;cursor:pointer;letter-spacing:0.3px;
+  box-shadow:0 10px 22px rgba(255,159,69,0.4);margin-bottom:26px;
+  width:min(84vw,360px);transition:transform 0.15s, box-shadow 0.15s;
+}
+.draw-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 14px 26px rgba(255,159,69,0.48)}
+.draw-btn:active:not(:disabled){transform:scale(0.97)}
+.draw-btn:disabled{background:#D9D5EC;color:#9994B8;cursor:not-allowed;box-shadow:none}
+
+/* ===== 패널 ===== */
+.panel{
+  position:relative;background:var(--paper);border-radius:24px;
+  padding:26px 20px 20px;text-align:left;
+  box-shadow:0 20px 40px rgba(42,37,80,0.10);
+  border:1px solid #EFE9FF;
+}
+.panel::before{
+  content:"";position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+  width:64px;height:22px;border-radius:0 0 14px 14px;
+  background:linear-gradient(180deg,var(--violet),var(--violet-dark));
+  box-shadow:0 6px 10px rgba(108,92,231,0.3);
+}
+
+.st{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;margin:18px 0 10px;font-size:15px;color:var(--ink);
+}
+.st:first-of-type{margin-top:2px}
+.st::before{content:"";width:6px;height:16px;border-radius:4px;background:linear-gradient(180deg,var(--violet),var(--raspberry))}
+
+.row{display:flex;gap:8px;margin-bottom:8px}
+.input{
+  flex:1;min-width:0;padding:12px 14px;border:2px solid #E7E2FA;
+  border-radius:var(--r-sm);font-size:15px;background:#FBFAFF;color:var(--ink);
+  transition:border-color 0.15s, box-shadow 0.15s;
+}
+.input:focus{outline:none;border-color:var(--violet);box-shadow:0 0 0 3px rgba(108,92,231,0.15);background:#fff}
+
+.btn{border:0;border-radius:var(--r-sm);padding:12px 16px;font-weight:700;cursor:pointer;font-size:14px;transition:transform 0.12s, filter 0.12s}
+.btn:hover{filter:brightness(1.05)}
+.btn:active{transform:scale(0.97)}
+.blue{background:linear-gradient(100deg,var(--violet),var(--violet-dark));color:#fff}
+.black{background:linear-gradient(100deg,#3A3364,var(--ink));color:#fff}
+.green{background:linear-gradient(100deg,var(--mint),var(--mint-dark));color:#fff}
+.gray{background:#EFEAFB;color:var(--violet-dark)}
+.red{background:#FFE3EA;color:var(--raspberry)}
+
+.items{
+  display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;
+  border:1px solid #EFE9FF;padding:10px;border-radius:16px;background:#FBFAFF;
+}
+.item{
+  display:flex;align-items:center;gap:9px;padding:9px 10px;background:#fff;
+  border-radius:12px;border:1px solid #F1EEFB;box-shadow:0 2px 6px rgba(42,37,80,0.04);
+  transition:opacity 0.2s, background 0.2s;
+}
+.item.won{background:#F5F3FC;opacity:0.55}
+.num{
+  width:26px;height:26px;flex:none;display:flex;align-items:center;justify-content:center;
+  border-radius:999px;color:#fff;font-weight:700;font-size:12px;
+  background:linear-gradient(135deg,var(--violet),var(--raspberry));
+}
+.item:nth-child(4n+2) .num{background:linear-gradient(135deg,var(--mint),var(--mint-dark))}
+.item:nth-child(4n+3) .num{background:linear-gradient(135deg,var(--tangerine),var(--coral))}
+.item:nth-child(4n+4) .num{background:linear-gradient(135deg,var(--sun),var(--tangerine));color:#4A2600}
+.status{
+  font-size:11px;font-weight:700;white-space:nowrap;padding:4px 10px;border-radius:999px;
+  background:#EFEAFB;color:var(--ink-soft);
+}
+.item:not(.won) .status{background:#E4F9F2;color:var(--mint-dark)}
+.wide{width:100%;margin-top:8px}
+.reset{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.history{border-top:2px dashed #EFE9FF;margin-top:20px;padding-top:16px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{
+  position:relative;color:#fff;border-radius:8px;padding:7px 14px 7px 12px;
+  font-size:12px;font-weight:700;letter-spacing:0.2px;
+  background:linear-gradient(100deg,var(--violet),var(--violet-dark));
+  box-shadow:0 4px 10px rgba(42,37,80,0.15);
+}
+.chips .chip:nth-child(4n+2){background:linear-gradient(100deg,var(--mint),var(--mint-dark))}
+.chips .chip:nth-child(4n+3){background:linear-gradient(100deg,var(--coral),var(--raspberry))}
+.chips .chip:nth-child(4n+4){background:linear-gradient(100deg,var(--sun),var(--tangerine));color:#4A2600}
+.msg{
+  text-align:center;color:var(--ink-soft);font-size:12.5px;margin-top:16px;font-weight:600;
+  background:#F7F5FE;display:inline-block;padding:6px 14px;border-radius:999px;width:100%;
+}
+
+@media(max-width:500px){
+  .row{flex-direction:column}
+  .reset{grid-template-columns:1fr}
+  .status{display:none}
+}
+
+#fxLayer{position:fixed;inset:0;pointer-events:none;z-index:10050;overflow:hidden}
+
+/* ===== 화면 전체 추첨 오버레이 ===== */
+.draw-overlay{
+  position:fixed;inset:0;z-index:10000;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  padding:24px;
+  background:radial-gradient(circle at 50% 42%, rgba(108,92,231,0.38), rgba(18,14,42,0.86) 72%);
+  backdrop-filter:blur(3px);
+  opacity:0;pointer-events:none;
+  transition:opacity 0.25s ease;
+}
+.draw-overlay.open{opacity:1;pointer-events:auto}
+.overlay-panel{
+  width:min(86vw,480px);
+  min-height:220px;
+  border-radius:32px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:36px 26px;
+  background:linear-gradient(135deg,var(--violet),var(--violet-dark));
+  box-shadow:0 30px 70px rgba(0,0,0,0.45);
+  border:5px solid rgba(255,255,255,0.9);
+  transform:scale(0.85);
+  transition:background 0.35s ease, transform 0.3s cubic-bezier(.34,1.56,.64,1);
+}
+.draw-overlay.open .overlay-panel{transform:scale(1)}
+@media (prefers-reduced-motion:no-preference){
+  .draw-overlay.open .overlay-panel:not(.reveal){animation:overlayWiggle 0.5s ease-in-out infinite}
+}
+@keyframes overlayWiggle{
+  0%,100%{transform:scale(1) rotate(0deg)}
+  50%{transform:scale(1.03) rotate(-0.6deg)}
+}
+.overlay-panel.reveal{
+  background:linear-gradient(135deg,var(--coral),var(--tangerine));
+  animation:none;
+}
+.overlay-label{
+  font-family:'Fredoka','Noto Sans KR',sans-serif;
+  color:rgba(255,255,255,0.85);font-weight:600;font-size:13px;letter-spacing:2px;
+  margin-bottom:12px;text-align:center;
+}
+.overlay-text{
+  font-family:'Fredoka','Noto Sans KR',sans-serif;
+  color:#fff;font-weight:700;font-size:clamp(26px,7vw,42px);
+  text-align:center;line-height:1.28;word-break:break-word;
+}
+.draw-overlay-hint{
+  color:rgba(255,255,255,0.75);font-size:12.5px;font-weight:600;
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="eyebrow">🎡 ENGLISH DRAW GAME</div>
+  <h1 id="title">🎯 스마트 영어 활동 카드 뽑기</h1>
+  <div class="desc">카드를 역동적으로 섞은 뒤 중복 없이 한 장을 뽑아줍니다!</div>
+
+  <div class="card-stage" id="cardStage">
+    <span class="deco d1">✨</span>
+    <span class="deco d2">🎈</span>
+    <span class="deco d3">⭐</span>
+    <span class="deco d4">🎊</span>
+
+    <div id="flyingDeck" class="flying-deck">
+      <div class="fly-card"></div>
+      <div class="fly-card"></div>
+      <div class="fly-card"></div>
+    </div>
+
+    <div id="card" class="card" tabindex="0" role="button" aria-label="카드 뽑기">
+      <div class="card-face card-front">
+        <div class="icon">🎁</div>
+        <div class="title-main">CLICK TO DRAW</div>
+        <div class="sub">카드를 뽑으려면 눌러주세요!</div>
+      </div>
+      <div class="card-face card-back">
+        <div class="ribbon">SELECTED!</div>
+        <div id="cardText" class="card-text">READY</div>
+        <div class="shine"></div>
+      </div>
+    </div>
+  </div>
+
+  <button id="drawBtn" class="draw-btn">🪄 카드 섞고 뽑기!</button>
+
+  <section class="panel">
+    <div class="st">📝 활동 제목</div>
+    <div class="row">
+      <input id="titleInput" class="input">
+      <button id="titleSave" class="btn blue">저장</button>
+    </div>
+    <div class="st">🗂 활동 항목 (40개)</div>
+    <div id="items" class="items"></div>
+    <button id="add" class="btn black wide">＋ 항목 추가</button>
+    <button id="saveItems" class="btn blue wide">💾 항목 이름 저장</button>
+    <div class="reset">
+      <button id="round" class="btn green">🔄 카드 다시 시작</button>
+      <button id="full" class="btn gray">🗑 전체 초기화</button>
+    </div>
+    <div class="history">
+      <div class="st">🏆 뽑힌 카드 이력</div>
+      <div id="history" class="chips"></div>
+    </div>
+    <div id="msg" class="msg"></div>
+  </section>
+</main>
+
+<div id="fxLayer" aria-hidden="true"></div>
+
+<div id="drawOverlay" class="draw-overlay" aria-hidden="true">
+  <div id="overlayPanel" class="overlay-panel">
+    <div id="overlayLabel" class="overlay-label">두구두구두구...</div>
+    <div id="overlayText" class="overlay-text">?</div>
+  </div>
+  <div class="draw-overlay-hint">화면을 탭하면 닫혀요</div>
+</div>
+
+<script>
+const KEY="smart_card_v1";
+const INITIAL_ITEMS=[
+  "ride a bike", "play soccer", "play basketball", "play badminton", "go swimming",
+  "go hiking", "go fishing", "ride a skateboard", "jump rope", "roller skate",
+  "fly drones", "run in the park", "read a book", "watch a movie", "listen to music",
+  "draw comics", "take pictures", "make videos", "play computer games", "play the piano",
+  "paint a picture", "sing a song", "take dance classes", "make a paper airplane", "clean my room",
+  "help my parents", "cook with my family", "wash the dishes", "water the plants", "feed the pet",
+  "eat ice cream", "eat pizza", "go shopping", "visit my grandparents", "visit a friend",
+  "watch TV", "play a board game", "make a model", "write a diary", "plant a flower"
+];
+
+function id(){return crypto.randomUUID?crypto.randomUUID():Date.now()+"-"+Math.random()}
+function fresh(){return{title:"🎯 스마트 영어 활동 카드 뽑기",items:INITIAL_ITEMS.map(name=>({id:id(),name,disabled:false})),history:[]}}
+
+function load(){
+  try{
+    let d=JSON.parse(localStorage.getItem(KEY));
+    if(d&&Array.isArray(d.items)&&d.items.length>0){
+      d.items=d.items.map(a=>({id:a.id||id(),name:a.name||"항목",disabled:!!a.disabled}));
+      d.history=Array.isArray(d.history)?d.history:[];
+      d.title=d.title||"🎯 스마트 영어 활동 카드 뽑기";
+      return d;
+    }
+  }catch(e){}
+  return fresh();
+}
+
+let data=load(), drawing=false;
+const $=id=>document.getElementById(id);
+
+function save(){localStorage.setItem(KEY,JSON.stringify(data))}
+
+function render(){
+  $("title").textContent=data.title;
+  $("titleInput").value=data.title;
+  $("items").innerHTML="";
+  
+  data.items.forEach((a,i)=>{
+    let row=document.createElement("div");
+    row.className="item"+(a.disabled?" won":"");
+    let n=document.createElement("div");n.className="num";n.textContent=i+1;
+    let inp=document.createElement("input");inp.className="input";inp.value=a.name;
+    let st=document.createElement("div");st.className="status";st.textContent=a.disabled?"완료":"대기";
+    let del=document.createElement("button");del.className="btn red";del.textContent="삭제";
+    del.onclick=()=>delItem(i);
+    row.append(n,inp,st,del);
+    $("items").append(row);
+  });
+
+  $("history").innerHTML=data.history.length?data.history.map((a,i)=>`<span class="chip">${i+1}: ${a.name}</span>`).join(""):"<span style='color:#94a3b8;font-size:12px'>아직 뽑힌 카드가 없습니다.</span>";
+  
+  let left=data.items.filter(a=>!a.disabled).length;
+  $("msg").textContent=`전체 ${data.items.length}개 / 남은 카드 ${left}장`;
+  $("drawBtn").disabled=!left;
+}
+
+function delItem(i){
+  if(drawing)return;
+  data.items.splice(i,1);
+  save(); render();
+}
+
+function drawCard(){
+  if(drawing)return;
+  let avail=data.items.map((a,i)=>({a,i})).filter(o=>!o.a.disabled);
+  if(!avail.length)return;
+
+  drawing=true;
+  $("drawBtn").disabled=true;
+  let card=$("card");
+  let stage=$("cardStage");
+
+  card.classList.remove("is-flipped");
+
+  // 더욱 역동적인 사방 셔플 모션 시작
+  stage.classList.add("shuffling");
+  $("flyingDeck").style.display = "block";
+  card.style.opacity = "0";
+
+  let count=0;
+  let rollInterval=setInterval(()=>{
+    let randomItem=avail[Math.floor(Math.random()*avail.length)].a;
+    $("cardText").textContent=randomItem.name;
+    count++;
+    
+    if(count > 12){ // 셔플 시간 연장 (더 스릴 넘침)
+      clearInterval(rollInterval);
+      
+      stage.classList.remove("shuffling");
+      $("flyingDeck").style.display = "none";
+      card.style.opacity = "1";
+
+      let chosen=avail[Math.floor(Math.random()*avail.length)];
+      let targetItem=data.items[chosen.i];
+      targetItem.disabled=true;
+      
+      data.history.push({id:targetItem.id, name:targetItem.name});
+      $("cardText").textContent=targetItem.name;
+      
+      card.classList.add("is-flipped");
+      
+      setTimeout(()=>{
+        save();
+        render();
+        drawing=false;
+      }, 600);
+    }
+  }, 90);
+}
+
+$("drawBtn").onclick=drawCard;
+$("card").onclick=()=>{ if(!$("drawBtn").disabled) drawCard(); };
+$("card").onkeydown=(e)=>{ if((e.key==="Enter"||e.key===" ") && !$("drawBtn").disabled){ e.preventDefault(); drawCard(); } };
+
+$("titleSave").onclick=()=>{
+  if(drawing)return;
+  let v=$("titleInput").value.trim();
+  if(!v)return alert("제목을 입력해주세요.");
+  data.title=v;
+  save(); render();
+};
+
+$("saveItems").onclick=()=>{
+  if(drawing)return;
+  let inputs=document.querySelectorAll("#items .input");
+  inputs.forEach((e,i)=>{ if(data.items[i]) data.items[i].name=e.value.trim(); });
+  if(data.items.some(a=>!a.name))return alert("항목 이름을 비워둘 수 없습니다.");
+  let names=data.items.map(a=>a.name);
+  if(new Set(names).size!==names.length)return alert("중복된 항목 이름이 있습니다.");
+  save(); render();
+  alert("저장되었습니다.");
+};
+
+$("add").onclick=()=>{
+  if(drawing)return;
+  const inputs=[...document.querySelectorAll("#items .input")];
+  inputs.forEach((input,i)=>{ if(data.items[i]) data.items[i].name=input.value; });
+  data.items.push({id:id(), name:"활동 "+(data.items.length+1), disabled:false});
+  save(); render();
+};
+
+$("round").onclick=()=>{
+  if(drawing)return;
+  if(!confirm("카드를 모두 되돌리고 처음부터 다시 시작하시겠습니까?"))return;
+  data.items.forEach(a=>a.disabled=false);
+  data.history=[];
+  card.classList.remove("is-flipped");
+  $("cardText").textContent="READY";
+  save(); render();
+};
+
+$("full").onclick=()=>{
+  if(drawing)return;
+  if(!confirm("전체 초기화하시겠습니까?"))return;
+  data=fresh();
+  card.classList.remove("is-flipped");
+  $("cardText").textContent="READY";
+  save(); render();
+};
+
+render();
+</script>
+
+<script>
+/* 장식용 연출: 카드 로직에는 관여하지 않고 시각 효과만 담당 (DOM 상태를 관찰만 함) */
+(function(){
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const stage=document.getElementById('cardStage');
+  const cardEl=document.getElementById('card');
+  const cardTextEl=document.getElementById('cardText');
+  const fx=document.getElementById('fxLayer');
+  const overlay=document.getElementById('drawOverlay');
+  const overlayPanel=document.getElementById('overlayPanel');
+  const overlayLabel=document.getElementById('overlayLabel');
+  const overlayText=document.getElementById('overlayText');
+
+  const colors=['#6C5CE7','#FF6B6B','#FFC93C','#22C3A6','#FF9F45','#FF5D8F'];
+  const stars=['✨','⭐','🌟','🎉'];
+  let closeTimer=null;
+
+  function openOverlay(){
+    clearTimeout(closeTimer);
+    overlayPanel.classList.remove('reveal');
+    overlayLabel.textContent='두구두구두구...';
+    overlay.classList.add('open');
+  }
+  function closeOverlay(){
+    clearTimeout(closeTimer);
+    overlay.classList.remove('open');
+  }
+  overlay.addEventListener('click', closeOverlay);
+
+  // 셔플 중 텍스트를 실시간으로 오버레이에 반영
+  new MutationObserver(()=>{
+    overlayText.textContent = cardTextEl.textContent;
+  }).observe(cardTextEl,{childList:true,characterData:true,subtree:true});
+
+  // 셔플 시작 감지 → 화면 전체 오버레이 열기
+  new MutationObserver(()=>{
+    if(stage.classList.contains('shuffling')) openOverlay();
+  }).observe(stage,{attributes:true,attributeFilter:['class']});
+
+  function glowRing(){
+    const ring=document.createElement('div');
+    ring.style.cssText=`position:absolute;left:50%;top:50%;width:60px;height:60px;
+      border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:1;
+      background:radial-gradient(circle, rgba(255,201,60,0.55), rgba(255,107,107,0.28) 55%, transparent 72%);`;
+    stage.appendChild(ring);
+    ring.animate([
+      {transform:'translate(-50%,-50%) scale(0.4)',opacity:0.9},
+      {transform:'translate(-50%,-50%) scale(2.6)',opacity:0}
+    ],{duration:650,easing:'ease-out'}).onfinish=()=>ring.remove();
+  }
+
+  function screenFlash(x,y){
+    const flash=document.createElement('div');
+    flash.style.cssText=`position:absolute;left:${x}px;top:${y}px;width:10px;height:10px;
+      border-radius:50%;transform:translate(-50%,-50%);
+      background:radial-gradient(circle, rgba(255,255,255,0.9), rgba(255,201,60,0.35) 40%, transparent 70%);`;
+    fx.appendChild(flash);
+    flash.animate([
+      {transform:'translate(-50%,-50%) scale(1)',opacity:0.9},
+      {transform:'translate(-50%,-50%) scale(70)',opacity:0}
+    ],{duration:600,easing:'ease-out'}).onfinish=()=>flash.remove();
+  }
+
+  function screenBurst(x,y){
+    const spread=Math.min(window.innerWidth,window.innerHeight)*0.42;
+    for(let i=0;i<28;i++){
+      const p=document.createElement('div');
+      const size=7+Math.random()*6;
+      p.style.cssText=`position:absolute;left:${x}px;top:${y}px;width:${size}px;height:${size}px;
+        background:${colors[i%colors.length]};border-radius:${Math.random()>0.5?'50%':'2px'};opacity:0.95;`;
+      fx.appendChild(p);
+      const angle=Math.random()*Math.PI*2;
+      const dist=120+Math.random()*spread;
+      const dx=Math.cos(angle)*dist, dy=Math.sin(angle)*dist+60;
+      p.animate([
+        {transform:'translate(-50%,-50%) rotate(0deg)',opacity:1},
+        {transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) rotate(${Math.random()*360}deg)`,opacity:0}
+      ],{duration:900+Math.random()*500,easing:'cubic-bezier(.15,.7,.3,1)'}).onfinish=()=>p.remove();
+    }
+    for(let i=0;i<9;i++){
+      const s=document.createElement('div');
+      s.textContent=stars[i%stars.length];
+      s.style.cssText=`position:absolute;left:${x}px;top:${y}px;font-size:${18+Math.random()*10}px;`;
+      fx.appendChild(s);
+      const angle=Math.random()*Math.PI*2;
+      const dist=100+Math.random()*spread*0.9;
+      const dx=Math.cos(angle)*dist, dy=Math.sin(angle)*dist;
+      s.animate([
+        {transform:'translate(-50%,-50%) scale(0.4) rotate(0deg)',opacity:1},
+        {transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(1.2) rotate(${Math.random()*200-100}deg)`,opacity:0}
+      ],{duration:1000+Math.random()*400,easing:'cubic-bezier(.15,.7,.3,1)'}).onfinish=()=>s.remove();
+    }
+  }
+
+  function confettiRain(){
+    const w=window.innerWidth, h=window.innerHeight;
+    for(let i=0;i<26;i++){
+      const p=document.createElement('div');
+      const size=6+Math.random()*6;
+      const x=Math.random()*w;
+      const delay=Math.random()*350;
+      p.style.cssText=`position:absolute;left:${x}px;top:-20px;width:${size}px;height:${size*0.6}px;
+        background:${colors[i%colors.length]};border-radius:2px;opacity:0.95;`;
+      fx.appendChild(p);
+      p.animate([
+        {transform:'translateY(0) rotate(0deg)',opacity:1},
+        {transform:`translateY(${h+40}px) rotate(${360+Math.random()*360}deg)`,opacity:0.9}
+      ],{duration:1600+Math.random()*700,delay,easing:'cubic-bezier(.3,.1,.4,1)'}).onfinish=()=>p.remove();
+    }
+  }
+
+  // 결과 공개(카드 뒤집힘) 감지 → 오버레이에 결과 표시 + 화면 전체 이펙트
+  new MutationObserver(()=>{
+    if(cardEl.classList.contains('is-flipped')){
+      overlayText.textContent = cardTextEl.textContent;
+      overlayLabel.textContent = '오늘의 활동은 바로!';
+      overlayPanel.classList.add('reveal');
+
+      if(!reduceMotion){
+        glowRing();
+        stage.animate([
+          {transform:'scale(1)'},{transform:'scale(1.1)'},{transform:'scale(1)'}
+        ],{duration:420,easing:'cubic-bezier(.3,1.6,.4,1)'});
+
+        const rect=overlayPanel.getBoundingClientRect();
+        const originX=rect.left+rect.width/2, originY=rect.top+rect.height/2;
+        screenFlash(originX, originY);
+        screenBurst(originX, originY);
+        confettiRain();
+      }
+
+      clearTimeout(closeTimer);
+      closeTimer=setTimeout(closeOverlay, 2600);
+    }
+  }).observe(cardEl,{attributes:true,attributeFilter:['class']});
+})();
+</script>
+</body>
+</html>
